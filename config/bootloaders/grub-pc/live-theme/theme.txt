@@ -1,7 +1,7 @@
 desktop-image: "../splash.png"
 title-color: "#ffffff"
 title-font: "DejaVu Sans Bold 16"
-title-text: "debian-live-config 4.2.1 (Debian 12.2.0)"
+title-text: "seapath-live-installer 4.2.1 (Debian 12.2.0)"
 message-font: "Unifont Regular 16"
 terminal-font: "Unifont Regular 16"
 
@@ -23,9 +23,9 @@ terminal-font: "Unifont Regular 16"
         width = 80%
         top = 52%
         height = 48%-80
-        item_color = "#a8a8a8"
+        item_color = "#000000"
 	item_font = "DejaVu Sans Bold 14"
-        selected_item_color= "#ffffff"
+        selected_item_color= "#5b8fb0"
 	selected_item_font = "DejaVu Sans Bold 14"
         item_height = 16
         item_padding = 0
