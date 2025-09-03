@@ -1,0 +1,5 @@
+{
+    "name": "SEAPATH Debian standalone",
+    "version": "1.1.0",
+    "description": "Standalone EFI Debian image for SEAPATH"
+}

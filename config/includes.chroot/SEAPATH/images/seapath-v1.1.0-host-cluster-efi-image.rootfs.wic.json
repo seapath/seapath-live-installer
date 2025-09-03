@@ -1,0 +1,5 @@
+{
+    "name": "SEAPATH Yocto cluster",
+    "version": "1.1.0",
+    "description": "Cluster EFI Yocto image for SEAPATH"
+}

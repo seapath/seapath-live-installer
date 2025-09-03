@@ -1,0 +1,5 @@
+{
+    "name": "SEAPATH Yocto standalone",
+    "version": "1.1.0",
+    "description": "Standalone EFI Yocto image for SEAPATH"
+}

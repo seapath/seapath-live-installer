@@ -44,3 +44,7 @@ binary.modified_timestamps
 0010-disable-kexec-tools.hook.chroot
 0050-disable-sysvinit-tmpfs.hook.chroot
 config/source
+*.wic.gz*
+*.raw.gz*
+*.wic.bmap*
+*.pub
