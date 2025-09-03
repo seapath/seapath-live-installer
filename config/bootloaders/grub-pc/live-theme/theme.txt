@@ -13,7 +13,7 @@ terminal-font: "Unifont Regular 16"
         height = 20
         text = "@KEYMAP_SHORT@"
         align = "center"
-        color = "#ffffff"
+        color = "#5b8fb0"
 	font = "DejaVu Sans Bold 14"
 }
 
