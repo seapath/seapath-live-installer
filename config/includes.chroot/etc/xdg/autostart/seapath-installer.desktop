@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=seapath-installer
+Exec=start-seapath-installer
+StartupNotify=false
+Terminal=false
