@@ -1,0 +1,5 @@
+#!/bin/bash
+echo "I: running $0"
+
+echo "Enabling seapath.mount"
+systemctl enable seapath.mount

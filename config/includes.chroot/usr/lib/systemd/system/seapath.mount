@@ -1,0 +1,10 @@
+[Unit]
+Description=SEAPATH artifacts data
+DefaultDependencies=no
+
+[Mount]
+What=/dev/disk/by-label/DATA
+Where=/seapath
+
+[Install]
+WantedBy=multi-user.target
