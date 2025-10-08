@@ -50,3 +50,4 @@ config/source
 *.pub
 *.iso
 *.img
+config/packages/seapath-installer_*.deb
