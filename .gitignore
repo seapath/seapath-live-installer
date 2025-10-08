@@ -48,3 +48,5 @@ config/source
 *.raw.gz*
 *.wic.bmap*
 *.pub
+*.iso
+*.img

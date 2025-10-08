@@ -2,11 +2,11 @@
 #
 # SEAPATH Live installer iso creator.
 
-# Name:       fetch_seapath_images
-# Brief:      Fetch seapath yocto and debian images
-fetch_seapath_images() {
-    SEAPATH_IMAGES_DIR=config/includes.chroot/SEAPATH/images
-    SEAPATH_KEYS_DIR=config/includes.chroot/SEAPATH/keys
+# Name:       fetch_seapath_artifacts
+# Brief:      Fetch seapath yocto and debian artifacts
+fetch_seapath_artifacts() {
+    SEAPATH_IMAGES_DIR=mnt_extra/images
+    SEAPATH_KEYS_DIR=mnt_extra/ssh
 
     mkdir -p $SEAPATH_KEYS_DIR
     mkdir -p $SEAPATH_IMAGES_DIR
@@ -33,28 +33,56 @@ fetch_seapath_images() {
 
     for f in "${yocto_images[@]}"; do
         if [ ! -f "$SEAPATH_IMAGES_DIR/$f" ]; then
-            wget "$yocto_base_url/$f" -O "$SEAPATH_IMAGES_DIR/$f"
+            sudo wget "$yocto_base_url/$f" -O "$SEAPATH_IMAGES_DIR/$f"
         fi
     done
 
     for f in "${debian_images[@]}"; do
         if [ ! -f "$SEAPATH_IMAGES_DIR/$f" ]; then
-            wget "$debian_base_url/$f" -O "$SEAPATH_IMAGES_DIR/$f"
+            sudo wget "$debian_base_url/$f" -O "$SEAPATH_IMAGES_DIR/$f"
         fi
     done
 
     for k in "${keys[@]}"; do
         if [ ! -f "$SEAPATH_KEYS_DIR/$k" ]; then
-            wget "$yocto_base_url/$k" -O "$SEAPATH_KEYS_DIR/$k"
+            sudo wget "$yocto_base_url/$k" -O "$SEAPATH_KEYS_DIR/$k"
         fi
     done
 
 }
 
-fetch_seapath_images
+append_data_partition(){
+    EXTRA_PARTITION_SIZE_MB=4096
+
+    if [ ! -f extra_partition.img ]; then
+        dd if=/dev/zero of=extra_partition.img bs=1M count=$EXTRA_PARTITION_SIZE_MB
+        mkfs.fat -n DATA extra_partition.img
+    fi
+
+    mkdir -p mnt_extra
+    sudo mount -o loop extra_partition.img mnt_extra
+
+    sudo mkdir -p mnt_extra/{ssh,images,others}
+    fetch_seapath_artifacts
+
+    sync
+    sudo umount mnt_extra
+    rmdir mnt_extra
+
+    xorriso -indev live-image-amd64.hybrid.iso \
+        -outdev modified.iso \
+        -boot_image any replay \
+        -append_partition 3 0xb extra_partition.img \
+        -commit \
+        -report_system_area plain
+}
+
+
 make build
 
 if [ -f live-image-amd64.hybrid.iso ]; then
+    append_data_partition
+    mv modified.iso seapath-live-installer-4.2.1.iso
     exit 0
 else
     echo "Build failed, see output log"
