@@ -4,6 +4,44 @@
 
 # Name:       fetch_seapath_artifacts
 # Brief:      Fetch seapath yocto and debian artifacts
+
+generate_images_metadata(){
+
+    json_content="{
+    \"name\": \"SEAPATH @FLAVOR@ @MACHINE@\",
+    \"version\": \"@VERSION@\",
+    \"description\": \"@DESCRIPTION@\"
+}"
+
+    flavor=$1
+
+    if [ $flavor == "Debian" ]; then
+        description="A x86 SEAPATH Debian Image for all machines"
+        filename=$(basename -s .raw.gz $2)
+        machine="generic"
+    else
+        filename=$(basename -s .wic.gz $2)
+        machine=$(echo $filename | cut -d'-' -f4)
+
+        # Observer image does not have host in the name
+        if [ $(echo $filename | grep -c "host") -eq 0 ]; then
+            machine=$(echo $filename | cut -d'-' -f3)
+        fi
+        description="A x86 SEAPATH Yocto Image for $machine machines"
+    fi
+
+    version=$(echo $filename | cut -d'-' -f2)
+    echo $json_content > "${filename}.json"
+
+    sed -i \
+        -e "s/@FLAVOR@/$flavor/" \
+        -e "s/@MACHINE@/$machine/" \
+        -e "s/@VERSION@/$version/" \
+        -e "s/@DESCRIPTION@/$description/" \
+        "${filename}.json"
+}
+
+
 fetch_seapath_artifacts() {
     SEAPATH_IMAGES_DIR=mnt_extra/images
     SEAPATH_KEYS_DIR=mnt_extra/ssh
@@ -20,7 +58,7 @@ fetch_seapath_artifacts() {
     )
 
     debian_images=(
-        "seapath-debian.raw.gz"
+        "seapath-v1.1.0-generic.rootfs.raw.gz"
     )
 
     keys=(
@@ -34,12 +72,20 @@ fetch_seapath_artifacts() {
     for f in "${yocto_images[@]}"; do
         if [ ! -f "$SEAPATH_IMAGES_DIR/$f" ]; then
             sudo wget "$yocto_base_url/$f" -O "$SEAPATH_IMAGES_DIR/$f"
+            if [[ $f == *.wic.gz ]]; then
+                generate_images_metadata "Yocto" "$f"
+                sudo mv "${f%.wic.gz}.json" "$SEAPATH_IMAGES_DIR/"
+            fi
         fi
     done
 
     for f in "${debian_images[@]}"; do
         if [ ! -f "$SEAPATH_IMAGES_DIR/$f" ]; then
             sudo wget "$debian_base_url/$f" -O "$SEAPATH_IMAGES_DIR/$f"
+            if [[ $f == *.raw.gz ]]; then
+                generate_images_metadata "Debian" "$f"
+                sudo mv "${f%.raw.gz}.json" "$SEAPATH_IMAGES_DIR/"
+            fi
         fi
     done
 
