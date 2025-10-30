@@ -1,62 +1,161 @@
-# debian-live-config
+<!--Copyright (C) 2025 Savoir-faire Linux, Inc.
+SPDX-License-Identifier: GPL-3.0-or-later -->
 
-[![](https://gitlab.com/nodiscc/debian-live-config/badges/master/pipeline.svg)](https://gitlab.com/nodiscc/debian-live-config/-/pipelines)
+# seapath-live-installer
 
-[Debian GNU/Linux](https://www.debian.org/) desktop operating system for personal computers & workstations.
+> A customized live distribution installer for SEAPATH based on
+> debian-live-config.
 
-![](https://gitlab.com/nodiscc/toolbox/-/raw/master/DOC/SCREENSHOTS/debian-live-config-4.0.0-main.png)
-
-## Features
-
-- Ready-to-use operating system for personal computers/workstations
-- Preinstalled, preconfigured software for common tasks (office, multimedia, network...)
-- Good out-of-the-box experience with a focus on usability
-- Installation time < 10 minutes, without Internet access
-- Able to run [live](https://en.wikipedia.org/wiki/Live_USB) from USB drive (no installation required)
-- Fits on a 2GB USB drive
-- Only uses official Debian [stable](https://wiki.debian.org/DebianStable) + [backports](https://wiki.debian.org/Backports) packages and as few third-party components as possible
-- Reliable, low maintenance
-- Lightweight/low resource usage, good performance on low-end or recycled hardware
-- Proprietary drivers/firmware for good compatibility with recent hardware
-
-This repository contains the `live-build` configuration and scripts used to build a custom Debian ISO image. See [Building a custom Debian ISO image](doc/md/custom.md).
+seapath-live-installer is the live OS installer used to install SEAPATH
+on a target machine.
 
 
-## Download
+> **NOTE:**  This project only concerns the live OS installer. For the
+> specific installer application, see
+> [seapath-installer](https://github.com/seapath/seapath-installer)
 
-**[![](doc/md/download.png) Download .ISO image](https://github.com/nodiscc/debian-live-config/releases/download/4.2.1/debian-live-config-4.2.1-debian-bookworm-amd64.iso)** (64-bit)
+## Fork Information
+
+This project is a fork of [debian-live-config](https://gitlab.com/nodiscc/debian-live-config),
+a Debian live distribution configuration and generation project.
+
+**Upstream**: https://gitlab.com/nodiscc/debian-live-config
+
+## SEAPATH-Specific Features
+
+- Minimization of installed packages to reduce the installer size
+- Custom SEAPATH branding (splash screen, logos, etc.)
+- Automatic fetch of latest SEAPATH images release
+- SEAPATH artifacts modification after ISO creation (to add images, SSH
+  keys, etc.)
+
+## Installation
+
+### Prerequisites
+
+seapath-live-installer is already configured to build Calamares in a Docker
+container using [cqfd](https://github.com/savoirfairelinux/cqfd), and
+we strongly recommend using it to build the installer.
+
+Make sure your localhost system complies with the following
+dependencies:
+
+```
+docker
+```
+
+Install `cqfd`:
+```
+git clone https://github.com/savoirfairelinux/cqfd.git
+cd cqfd
+sudo make install
+```
+
+If you wish to build seapath-live-installer without Docker (again, not
+recommended), make sure the dependencies listed in `.cqfd/Dockerfile`
+are installed on your system (Debian 12).
+
+**sudo** permission is required to build the seapath-live-installer.
+Using cqfd will automatically handle this for you, without asking for
+authentication.
+
+By default, the latest version of seapath-installer .deb package is
+used. If you wish to use a specific version, replace the .deb package
+located in `config/packages/seapath-installer_1.0_all.deb`.
+
+## Getting Started
+### Building seapath-live-installer
+
+To build seapath-live-installer using `cqfd`, first generate the cqfd image:
+
+```
+cqfd init
+```
+
+Then, build the installer:
+
+```
+cqfd
+```
+
+To build outside of cqfd, run:
+```
+./build.sh
+```
+
+If everything went well, an `.iso` image
+seapath-live-installer-<version>.iso will be created in the root
+directory of the project.
+
+### Installing seapath-live-installer
+
+To install seapath-installer, simply burn the generated ISO image to a USB
+drive using a tool like `dd` or `balena-etcher`, and boot from it.
+
+### Booting seapath-live-installer
+
+Simply boot from the USB drive containing seapath-live-installer. The live
+system will start automatically.
+
+### seapath-live-installer artifacts
+
+At the end of the installation, seapath-live-installer will add a DATA
+partition to the generated ISO image. This partition is used to store the
+installation artifacts required by seapath-installer, and modified them
+upon iso image creation. It has the following structure:
+
+```
+/DATA
+├── images
+│   ├── seapath-<version>-guest.raw.gz
+│   └── seapath-<version>-observer-efi-image.rootfs.wic.gz
+└── ssh
+    └── ssh_key1.pub
+    └── ssh_key2.pub
+```
+
+Where:
+- `images/` contains the SEAPATH images to install by seapath-installer
+  in `raw.gz` or `wic.gz` format
+- `ssh/` contains the SSH public keys to add to the installed system
 
 
-## Documentation
+### SEAPATH target configuration
 
-- [Download and installation](doc/md/download-and-installation.md)
-- [Usage](doc/md/usage.md)
-- [Software: Utility](doc/md/packages/utility.md)
-- [Software: Internet and network](doc/md/packages/network.md)
-- [Software: Audio and video](doc/md/packages/audio-video.md)
-- [Software: Office](doc/md/packages/office.md)
-- [Software: Graphics](doc/md/packages/graphics.md)
-- [Software: System](doc/md/packages/system.md)
-- [Software: Development](doc/md/packages/development.md)
-- [Software: Games](doc/md/packages/games.md)
-- [Software: Extras](doc/md/packages/extras.md)
-- [Changelog](CHANGELOG.md)
+By default, the following configuration are installed on the installed SEAPATH
+system:
 
+- Keyboard layout
+- SEAPATH images
+- SSH Keys: will be append to the `~/.ssh/authorized_keys` file of
+the `admin` and `ansible` users on the installed system.
+- Network configuration: DHCP/static IP configuration for the selected
+  interface.
+> **NOTE:**: The configured network interface is only the management
+> interface used to connect to the SEAPATH machine by Ansible and the
+> `admin` user.
+- Partition: installed partition layout depends on the selected SEAPATH
+  image. It cannot be modified by the user.
+> **NOTE:**: On SEAPATH Yocto, the persistent partition is extended to
+> the maximum free space available on the target device.
 
-## Screenshots
+## Contributing
 
-![](https://gitlab.com/nodiscc/toolbox/-/raw/master/DOC/SCREENSHOTS/debian-live-config-4.0.0-main.png)
-
-![](https://gitlab.com/nodiscc/toolbox/-/raw/master/DOC/SCREENSHOTS/debian-live-config-4.0.0-windows.png)
-
-
-## Source code
-
-- [Gitlab](https://gitlab.com/nodiscc/debian-live-config) (mirror)
-- [Github](https://github.com/nodiscc/debian-live-config) (mirror)
-
+See
+[CONTRIBUTING.md](https://github.com/seapath/.github/blob/main/CONTRIBUTING.md)
+for details.
+On this project, each PR is automatically checked by a CI pipeline.
 
 ## License
 
-[LICENSE](LICENSE)
+This project maintains the original debian-live-config licenses. See
+[LICENSES](./LICENSE) file.
 
+## Debian-live-config upstream
+
+For more information about the upstream debian-live-config project, visit
+https://gitlab.com/nodiscc/debian-live-config/
+
+# Release notes
+## Version 1.0.0
+Initial release
