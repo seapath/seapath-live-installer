@@ -108,7 +108,8 @@ upon iso image creation. It has the following structure:
 /DATA
 ├── images
 │   ├── seapath-<version>-guest.raw.gz
-│   └── seapath-<version>-observer-efi-image.rootfs.wic.gz
+│   ├── seapath-<version>-observer-efi-image.rootfs.wic.gz
+│   └── seapath-<version>-observer-efi-image.rootfs.wic.bmap
 └── ssh
     └── ssh_key1.pub
     └── ssh_key2.pub
@@ -116,7 +117,9 @@ upon iso image creation. It has the following structure:
 
 Where:
 - `images/` contains the SEAPATH images to install by seapath-installer
-  in `raw.gz` or `wic.gz` format
+  in `raw.gz` or `wic.gz` format.
+  **NOTE:** for SEAPATH yocto images their associated .wic.bmap files should
+  also be in this directory.
 - `ssh/` contains the SSH public keys to add to the installed system
 
 
