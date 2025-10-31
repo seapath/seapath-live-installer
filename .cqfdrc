@@ -4,6 +4,7 @@ name='seapath-live-installer'
 
 [build]
 flavors='sfl_ci'
+command='./build.sh'
 
 [sfl_ci]
 command='./build.sh'
