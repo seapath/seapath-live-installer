@@ -160,5 +160,5 @@ For more information about the upstream debian-live-config project, visit
 https://gitlab.com/nodiscc/debian-live-config/
 
 # Release notes
-## Version 1.0.0
+## Version 1.1.0
 Initial release
