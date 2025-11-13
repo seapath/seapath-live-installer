@@ -5,6 +5,8 @@
 # Name:       fetch_seapath_artifacts
 # Brief:      Fetch seapath yocto and debian artifacts
 
+export VERSION="1.1.0"
+
 generate_images_metadata(){
 
     json_content="{
@@ -41,6 +43,12 @@ generate_images_metadata(){
         "${filename}.json"
 }
 
+fetch_seapath_installer(){
+    mkdir -p config/packages
+    sudo wget "https://github.com/seapath/seapath-installer/releases/download/v${VERSION}/seapath-installer_${VERSION}_all.deb" \
+     -O seapath-installer_${VERSION}_all.deb
+    sudo mv seapath-installer_${VERSION}_all.deb config/packages/seapath-installer_${VERSION}_all.deb
+}
 
 fetch_seapath_artifacts() {
     SEAPATH_IMAGES_DIR=mnt_extra/images
@@ -49,24 +57,24 @@ fetch_seapath_artifacts() {
     mkdir -p $SEAPATH_KEYS_DIR
     mkdir -p $SEAPATH_IMAGES_DIR
     yocto_images=(
-        "seapath-v1.1.0-observer-efi-image.rootfs.wic.gz"
-        "seapath-v1.1.0-observer-efi-image.rootfs.wic.bmap"
-        "seapath-v1.1.0-host-standalone-efi-image.rootfs.wic.gz"
-        "seapath-v1.1.0-host-standalone-efi-image.rootfs.wic.bmap"
-        "seapath-v1.1.0-host-cluster-efi-image.rootfs.wic.gz"
-        "seapath-v1.1.0-host-cluster-efi-image.rootfs.wic.bmap"
+        "seapath-v${VERSION}-observer-efi-image.rootfs.wic.gz"
+        "seapath-v${VERSION}-observer-efi-image.rootfs.wic.bmap"
+        "seapath-v${VERSION}-host-standalone-efi-image.rootfs.wic.gz"
+        "seapath-v${VERSION}-host-standalone-efi-image.rootfs.wic.bmap"
+        "seapath-v${VERSION}-host-cluster-efi-image.rootfs.wic.gz"
+        "seapath-v${VERSION}-host-cluster-efi-image.rootfs.wic.bmap"
     )
 
     debian_images=(
-        "seapath-v1.1.0-generic.rootfs.raw.gz"
+        "seapath-v${VERSION}-generic.rootfs.raw.gz"
     )
 
     keys=(
-        "seapath-v1.1.0-artifacts-key.pub"
+        "seapath-v${VERSION}-artifacts-key.pub"
     )
 
-    yocto_base_url="https://github.com/seapath/yocto-bsp/releases/download/v1.1.0"
-    debian_base_url="https://github.com/Paullgk/seapath-debian/releases/download/v1.1.0/"
+    yocto_base_url="https://github.com/seapath/yocto-bsp/releases/download/v${VERSION}"
+    debian_base_url="https://github.com/Paullgk/seapath-debian/releases/download/v${VERSION}/"
 
 
     for f in "${yocto_images[@]}"; do
@@ -123,12 +131,12 @@ append_data_partition(){
         -report_system_area plain
 }
 
-
+fetch_seapath_installer
 make build
 
 if [ -f live-image-amd64.hybrid.iso ]; then
     append_data_partition
-    mv modified.iso seapath-live-installer-4.2.1.iso
+    mv modified.iso seapath-live-installer-${VERSION}.iso
     exit 0
 else
     echo "Build failed, see output log"
