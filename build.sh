@@ -5,7 +5,7 @@
 # Name:       fetch_seapath_artifacts
 # Brief:      Fetch seapath yocto and debian artifacts
 
-export VERSION="1.1.0"
+export VERSION="1.2.0"
 
 generate_images_metadata(){
 
@@ -18,9 +18,9 @@ generate_images_metadata(){
     flavor=$1
 
     if [ $flavor == "Debian" ]; then
-        description="A x86 SEAPATH Debian Image for all machines"
         filename=$(basename -s .raw.gz $2)
-        machine="generic"
+        machine=$(echo $filename |  cut -d '.' -f3|cut -d '-' -f3)
+        description="A x86 SEAPATH Debian Image for $machine machines"
     else
         filename=$(basename -s .wic.gz $2)
         machine=$(echo $filename | cut -d'-' -f4)
@@ -66,7 +66,10 @@ fetch_seapath_artifacts() {
     )
 
     debian_images=(
-        "seapath-v${VERSION}-generic.rootfs.raw.gz"
+        "seapath-v${VERSION}-generic-standalone.rootfs.raw.gz"
+        "seapath-v${VERSION}-generic-standalone.rootfs.bmap"
+        "seapath-v${VERSION}-generic-cluster.rootfs.raw.gz"
+        "seapath-v${VERSION}-generic-cluster.rootfs.bmap"
     )
 
     keys=(
@@ -74,7 +77,7 @@ fetch_seapath_artifacts() {
     )
 
     yocto_base_url="https://github.com/seapath/yocto-bsp/releases/download/v${VERSION}"
-    debian_base_url="https://github.com/Paullgk/seapath-debian/releases/download/v${VERSION}/"
+    debian_base_url="https://github.com/seapath/build_debian_iso/releases/download/v${VERSION}/"
 
 
     for f in "${yocto_images[@]}"; do
