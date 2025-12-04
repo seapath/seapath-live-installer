@@ -160,5 +160,9 @@ For more information about the upstream debian-live-config project, visit
 https://gitlab.com/nodiscc/debian-live-config/
 
 # Release notes
+## Version 1.2.0
+- Support for seapath-installer v1.2.0
+- Fetch SEAPATH Debian image bmap files
+
 ## Version 1.1.0
 Initial release
