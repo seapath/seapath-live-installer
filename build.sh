@@ -134,7 +134,26 @@ append_data_partition(){
         -report_system_area plain
 }
 
-fetch_seapath_installer
+no_installer_fetch=false
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --no-installer-fetch)
+            no_installer_fetch=true
+            shift
+            ;;
+        *)
+            echo "Unknown option: $1"
+            echo "Use --no-installer-fetch to avoid fetching seapath-installer from GitHub"
+            exit 1
+            ;;
+    esac
+done
+
+if ! $no_installer_fetch; then
+  fetch_seapath_installer
+fi
+
 make build
 
 if [ -f live-image-amd64.hybrid.iso ]; then

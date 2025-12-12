@@ -61,7 +61,8 @@ authentication.
 
 By default, the latest version of seapath-installer .deb package is
 used. If you wish to use a specific version, replace the .deb package
-located in `config/packages/seapath-installer_1.0_all.deb`.
+located in `config/packages/seapath-installer_1.0_all.deb` and use the
+`--no-installer-fetch` option of `build.sh`.
 
 ## Getting Started
 ### Building seapath-live-installer
