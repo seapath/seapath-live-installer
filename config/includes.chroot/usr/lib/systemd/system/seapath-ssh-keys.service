@@ -1,0 +1,12 @@
+[Unit]
+Description=Install SEAPATH public keys for user
+DefaultDependencies=no
+After=seapath.mount live-config.service
+
+[Service]
+Type=oneshot
+ExecStart=bash -c 'cat /seapath/ssh/*.pub >> /home/user/.ssh/authorized_keys'
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

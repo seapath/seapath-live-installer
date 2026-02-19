@@ -4,3 +4,4 @@ echo "I: running $0"
 
 ufw allow ssh
 systemctl enable ssh
+systemctl enable seapath-ssh-keys.service
