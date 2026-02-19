@@ -1,0 +1,6 @@
+#!/bin/bash
+
+echo "I: running $0"
+
+ufw allow ssh
+systemctl enable ssh
