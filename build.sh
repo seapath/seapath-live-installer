@@ -70,6 +70,8 @@ fetch_seapath_artifacts() {
         "seapath-v${SEAPATH_IMAGES_VERSION}-generic-standalone.rootfs.bmap"
         "seapath-v${SEAPATH_IMAGES_VERSION}-generic-cluster.rootfs.raw.gz"
         "seapath-v${SEAPATH_IMAGES_VERSION}-generic-cluster.rootfs.bmap"
+        "seapath-v${SEAPATH_IMAGES_VERSION}-generic-observer.rootfs.raw.gz"
+        "seapath-v${SEAPATH_IMAGES_VERSION}-generic-observer.rootfs.bmap"
     )
 
     keys=(
