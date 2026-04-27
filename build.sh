@@ -174,7 +174,7 @@ if [ -f live-image-amd64.hybrid.iso ]; then
     if $empty; then
         output_iso="seapath-live-installer-${SEAPATH_INSTALLER_VERSION}-empty.iso"
     else
-        output_iso="seapath-live-installer-${SEAPATH_INSTALLER_VERSION}.iso"
+        output_iso="seapath-live-installer-bundled.iso"
     fi
     mv modified.iso "${output_iso}"
     zip "${output_iso}".zip "${output_iso}"

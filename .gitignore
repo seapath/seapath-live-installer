@@ -51,3 +51,4 @@ config/source
 *.iso
 *.img
 config/packages/seapath-installer_*.deb
+seapath-live-installer*.zip
