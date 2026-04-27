@@ -20,5 +20,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	cpio \
 	apt-utils \
 	xorriso \
-	dosfstools
+	dosfstools \
+	zip
 RUN echo '%builders    ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers

@@ -177,8 +177,9 @@ if [ -f live-image-amd64.hybrid.iso ]; then
         output_iso="seapath-live-installer-${SEAPATH_INSTALLER_VERSION}.iso"
     fi
     mv modified.iso "${output_iso}"
+    zip "${output_iso}".zip "${output_iso}"
     # Clean up intermediate artifacts so subsequent builds start fresh
-    rm -f extra_partition.img live-image-amd64.hybrid.iso
+    rm -f extra_partition.img live-image-amd64.hybrid.iso "${output_iso}"
     exit 0
 else
     echo "Build failed, see output log"
