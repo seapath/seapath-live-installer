@@ -5,8 +5,8 @@
 # Name:       fetch_seapath_artifacts
 # Brief:      Fetch seapath yocto and debian artifacts
 
-export SEAPATH_IMAGES_VERSION="1.2.1"
-export SEAPATH_INSTALLER_VERSION="1.2.2"
+export SEAPATH_IMAGES_VERSION="2.0.0"
+export SEAPATH_INSTALLER_VERSION="2.0.0"
 generate_images_metadata(){
 
     json_content="{

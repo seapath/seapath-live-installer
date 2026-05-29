@@ -184,6 +184,9 @@ For more information about the upstream debian-live-config project, visit
 https://gitlab.com/nodiscc/debian-live-config/
 
 # Release notes
+## Version 2.0.0
+- Align version on new SEAPATH release
+
 ## Version 1.2.2
 - Correct bug on bmap file names
 - Add support to build an empty installer
