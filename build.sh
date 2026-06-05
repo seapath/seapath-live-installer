@@ -43,16 +43,23 @@ generate_images_metadata(){
         "${filename}.json"
 }
 
+# Fetch seapath installer.
+# Take the base_url as argument
 fetch_seapath_installer(){
     mkdir -p config/packages
-    sudo wget "https://github.com/seapath/seapath-installer/releases/download/v${SEAPATH_INSTALLER_VERSION}/seapath-installer_${SEAPATH_INSTALLER_VERSION}_all.deb" \
-     -O seapath-installer_${SEAPATH_INSTALLER_VERSION}_all.deb
+    base_url="$1"
+    sudo wget "${base_url}/seapath-installer_${SEAPATH_INSTALLER_VERSION}_all.deb" \
+      -O seapath-installer_${SEAPATH_INSTALLER_VERSION}_all.deb
     sudo mv seapath-installer_${SEAPATH_INSTALLER_VERSION}_all.deb config/packages/seapath-installer_${SEAPATH_INSTALLER_VERSION}_all.deb
 }
 
+# Fetch seapath artifacts.
+# Take two arguments: The base_url for Yocto images and the base_url for Debian images.
 fetch_seapath_artifacts() {
     SEAPATH_IMAGES_DIR=mnt_extra/images
     SEAPATH_KEYS_DIR=mnt_extra/ssh
+    yocto_base_url="$1"
+    debian_base_url="$2"
 
     mkdir -p $SEAPATH_KEYS_DIR
     mkdir -p $SEAPATH_IMAGES_DIR
@@ -77,10 +84,6 @@ fetch_seapath_artifacts() {
     keys=(
         "seapath-v${SEAPATH_IMAGES_VERSION}-artifacts-key.pub"
     )
-
-    yocto_base_url="https://github.com/seapath/yocto-bsp/releases/download/v${SEAPATH_IMAGES_VERSION}"
-    debian_base_url="https://github.com/seapath/build_debian_iso/releases/download/v${SEAPATH_IMAGES_VERSION}/"
-
 
     for f in "${yocto_images[@]}"; do
         if [ ! -f "$SEAPATH_IMAGES_DIR/$f" ]; then
@@ -123,7 +126,7 @@ append_data_partition(){
 
     sudo mkdir -p mnt_extra/{ssh,images,others}
     if ! $empty; then
-        fetch_seapath_artifacts
+        fetch_seapath_artifacts "$yocto_base_url" "$debian_base_url"
     else
         echo "Building empty installer: skipping SEAPATH artifacts fetch"
     fi
@@ -142,6 +145,10 @@ append_data_partition(){
 
 no_installer_fetch=false
 empty=false
+tag=""
+installer_base_url=""
+yocto_base_url=""
+debian_base_url=""
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -153,18 +160,55 @@ while [[ $# -gt 0 ]]; do
             empty=true
             shift
             ;;
+        --tag)
+            tag="${2:-$tag}"
+            shift 2
+            ;;
+        --installer-base-url)
+            installer_base_url="${2:-$installer_base_url}"
+            shift 2
+            ;;
+        --yocto-base-url)
+            yocto_base_url="${2:-$yocto_base_url}"
+            shift 2
+            ;;
+        --debian-base-url)
+            debian_base_url="${2:-$debian_base_url}"
+            shift 2
+            ;;
         *)
             echo "Unknown option: $1"
-            echo "Usage: $0 [--no-installer-fetch] [--empty]"
+            echo "Usage: $0 [--no-installer-fetch] [--empty] [--tag TAG] [--installer-base-url URL] [--yocto-base-url URL] [--debian-base-url URL]"
             echo "  --no-installer-fetch  Do not fetch seapath-installer from GitHub"
             echo "  --empty               Generate an empty installer (no SEAPATH images)"
+            echo "  --tag                 Override SEAPATH images and installer versions"
+            echo "  --installer-base-url  Base URL for seapath-installer deb download. Default to GitHub releases"
+            echo "  --yocto-base-url      Base URL for Yocto artifacts download. Default to GitHub releases"
+            echo "  --debian-base-url     Base URL for Debian artifacts download. Default to GitHub releases"
             exit 1
             ;;
     esac
 done
 
+if [ -n "$tag" ]; then
+    SEAPATH_IMAGES_VERSION="$tag"
+    SEAPATH_INSTALLER_VERSION="$tag"
+fi
+
+if [ -z "$installer_base_url" ]; then
+    installer_base_url="https://github.com/seapath/seapath-installer/releases/download/v${SEAPATH_INSTALLER_VERSION}"
+fi
+
+if [ -z "$yocto_base_url" ]; then
+    yocto_base_url="https://github.com/seapath/yocto-bsp/releases/download/v${SEAPATH_IMAGES_VERSION}"
+fi
+
+if [ -z "$debian_base_url" ]; then
+    debian_base_url="https://github.com/seapath/build_debian_iso/releases/download/v${SEAPATH_IMAGES_VERSION}/"
+fi
+
 if ! $no_installer_fetch; then
-  fetch_seapath_installer
+  fetch_seapath_installer "$installer_base_url"
 fi
 
 make build
