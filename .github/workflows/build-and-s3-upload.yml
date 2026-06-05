@@ -1,0 +1,86 @@
+# Copyright (C) 2025 Savoir-faire Linux, Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+name: Build and Upload seapath-live-installer to S3
+run-name: Build ${{ inputs.build_id }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_id:
+        type: string
+        required: true
+        description: >-
+          Build identifier for organizing artifacts in S3.
+
+jobs:
+  build-and-upload:
+    runs-on: seapath-installer-builder
+    env:
+      BUILD_ID: ${{ inputs.build_id }}
+      RELEASE_BASE_URL: https://releases.seapath.org/builds/${{ inputs.build_id }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ca-certificates curl git sudo
+
+      - name: Install Docker
+        run: |
+          sudo install -m 0755 -d /etc/apt/keyrings
+          sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+          sudo chmod a+r /etc/apt/keyrings/docker.asc
+          sudo echo \
+          "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+          $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+          sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+      - name: Install cqfd
+        run: |
+          git clone https://github.com/savoirfairelinux/cqfd.git
+          cd cqfd
+          sudo make install
+      - name: Initialize cqfd
+        run: cqfd init
+
+      - name: Build empty installer
+        run: |
+          cqfd run ./build.sh \
+            --empty \
+            --tag "$BUILD_ID" \
+            --installer-base-url "$RELEASE_BASE_URL"
+
+      - name: Build bundled installer
+        run: |
+          cqfd run ./build.sh \
+            --tag "$BUILD_ID" \
+            --installer-base-url "$RELEASE_BASE_URL" \
+            --yocto-base-url "$RELEASE_BASE_URL" \
+            --debian-base-url "$RELEASE_BASE_URL"
+
+      - name: Upload ISO to S3
+        env:
+          S3CMD_ACCESS_KEY: ${{ secrets.S3CMD_ACCESS_KEY }}
+          S3CMD_SECRET_KEY: ${{ secrets.S3CMD_SECRET_KEY }}
+          S3_BUCKET: s3://seapath-releases
+          S3_HOST: e1e604922c4057433cbe77d3700ac51c.r2.cloudflarestorage.com
+          S3_HOST_BUCKET: "%(bucket)s.e1e604922c4057433cbe77d3700ac51c.r2.cloudflarestorage.com"
+        run: |
+          which s3cmd || pip install s3cmd
+
+          bundled_installer=seapath-live-installer-${BUILD_ID}-seapath-images-${BUILD_ID}.iso.zip
+          empty_installer=seapath-live-installer-${BUILD_ID}-empty.iso.zip
+          s3cmd \
+            --access_key=${S3CMD_ACCESS_KEY} \
+            --secret_key=${S3CMD_SECRET_KEY} \
+            --host=${S3_HOST} \
+            --host-bucket=${S3_HOST_BUCKET} \
+            put "$bundled_installer" "$empty_installer" "${S3_BUCKET}/builds/${BUILD_ID}/"
+
+      - name: Report upload
+        run: |
+          echo "Build ID: ${BUILD_ID}"
+          echo "Release base URL: ${RELEASE_BASE_URL}"
