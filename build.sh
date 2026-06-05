@@ -5,8 +5,8 @@
 # Name:       fetch_seapath_artifacts
 # Brief:      Fetch seapath yocto and debian artifacts
 
-export SEAPATH_IMAGES_VERSION="2.0.0"
-export SEAPATH_INSTALLER_VERSION="2.0.0"
+export SEAPATH_IMAGES_VERSION="v2.0.0"
+export SEAPATH_INSTALLER_VERSION="v2.0.0"
 generate_images_metadata(){
 
     json_content="{
@@ -64,25 +64,25 @@ fetch_seapath_artifacts() {
     mkdir -p $SEAPATH_KEYS_DIR
     mkdir -p $SEAPATH_IMAGES_DIR
     yocto_images=(
-        "seapath-v${SEAPATH_IMAGES_VERSION}-observer-efi-image.rootfs.wic.gz"
-        "seapath-v${SEAPATH_IMAGES_VERSION}-observer-efi-image.rootfs.wic.bmap"
-        "seapath-v${SEAPATH_IMAGES_VERSION}-host-standalone-efi-image.rootfs.wic.gz"
-        "seapath-v${SEAPATH_IMAGES_VERSION}-host-standalone-efi-image.rootfs.wic.bmap"
-        "seapath-v${SEAPATH_IMAGES_VERSION}-host-cluster-efi-image.rootfs.wic.gz"
-        "seapath-v${SEAPATH_IMAGES_VERSION}-host-cluster-efi-image.rootfs.wic.bmap"
+        "seapath-${SEAPATH_IMAGES_VERSION}-observer-efi-image.rootfs.wic.gz"
+        "seapath-${SEAPATH_IMAGES_VERSION}-observer-efi-image.rootfs.wic.bmap"
+        "seapath-${SEAPATH_IMAGES_VERSION}-host-standalone-efi-image.rootfs.wic.gz"
+        "seapath-${SEAPATH_IMAGES_VERSION}-host-standalone-efi-image.rootfs.wic.bmap"
+        "seapath-${SEAPATH_IMAGES_VERSION}-host-cluster-efi-image.rootfs.wic.gz"
+        "seapath-${SEAPATH_IMAGES_VERSION}-host-cluster-efi-image.rootfs.wic.bmap"
     )
 
     debian_images=(
-        "seapath-v${SEAPATH_IMAGES_VERSION}-generic-standalone.rootfs.raw.gz"
-        "seapath-v${SEAPATH_IMAGES_VERSION}-generic-standalone.rootfs.raw.bmap"
-        "seapath-v${SEAPATH_IMAGES_VERSION}-generic-cluster.rootfs.raw.gz"
-        "seapath-v${SEAPATH_IMAGES_VERSION}-generic-cluster.rootfs.raw.bmap"
-        "seapath-v${SEAPATH_IMAGES_VERSION}-generic-observer.rootfs.raw.gz"
-        "seapath-v${SEAPATH_IMAGES_VERSION}-generic-observer.rootfs.raw.bmap"
+        "seapath-${SEAPATH_IMAGES_VERSION}-generic-standalone.rootfs.raw.gz"
+        "seapath-${SEAPATH_IMAGES_VERSION}-generic-standalone.rootfs.raw.bmap"
+        "seapath-${SEAPATH_IMAGES_VERSION}-generic-cluster.rootfs.raw.gz"
+        "seapath-${SEAPATH_IMAGES_VERSION}-generic-cluster.rootfs.raw.bmap"
+        "seapath-${SEAPATH_IMAGES_VERSION}-generic-observer.rootfs.raw.gz"
+        "seapath-${SEAPATH_IMAGES_VERSION}-generic-observer.rootfs.raw.bmap"
     )
 
     keys=(
-        "seapath-v${SEAPATH_IMAGES_VERSION}-artifacts-key.pub"
+        "seapath-${SEAPATH_IMAGES_VERSION}-artifacts-key.pub"
     )
 
     for f in "${yocto_images[@]}"; do
@@ -196,15 +196,15 @@ if [ -n "$tag" ]; then
 fi
 
 if [ -z "$installer_base_url" ]; then
-    installer_base_url="https://github.com/seapath/seapath-installer/releases/download/v${SEAPATH_INSTALLER_VERSION}"
+    installer_base_url="https://github.com/seapath/seapath-installer/releases/download/${SEAPATH_INSTALLER_VERSION}"
 fi
 
 if [ -z "$yocto_base_url" ]; then
-    yocto_base_url="https://github.com/seapath/yocto-bsp/releases/download/v${SEAPATH_IMAGES_VERSION}"
+    yocto_base_url="https://github.com/seapath/yocto-bsp/releases/download/${SEAPATH_IMAGES_VERSION}"
 fi
 
 if [ -z "$debian_base_url" ]; then
-    debian_base_url="https://github.com/seapath/build_debian_iso/releases/download/v${SEAPATH_IMAGES_VERSION}/"
+    debian_base_url="https://github.com/seapath/build_debian_iso/releases/download/${SEAPATH_IMAGES_VERSION}/"
 fi
 
 if ! $no_installer_fetch; then
