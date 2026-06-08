@@ -1,0 +1,37 @@
+name: Build and publish empty installer on release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: seapath-installer-builder
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ca-certificates curl git sudo
+
+      - name: Install cqfd
+        run: |
+          git clone https://github.com/savoirfairelinux/cqfd.git
+          cd cqfd
+          sudo make install
+
+      - name: Initialize cqfd
+        run: cqfd init
+
+      - name: Build empty seapath-live-installer
+        run: cqfd run ./build.sh --empty --tag ${{ github.event.release.tag_name }}
+
+      - name: Upload artifact
+        uses: softprops/action-gh-release@v3
+        with:
+          files: ./seapath-live-installer-${{ github.event.release.tag_name }}-empty.iso.zip
