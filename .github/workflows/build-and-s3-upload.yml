@@ -49,7 +49,8 @@ jobs:
             --tag "$BUILD_ID" \
             --installer-base-url "$RELEASE_BASE_URL" \
             --yocto-base-url "$RELEASE_BASE_URL" \
-            --debian-base-url "$RELEASE_BASE_URL"
+            --debian-base-url "$RELEASE_BASE_URL" \
+            --sles-base-url "$RELEASE_BASE_URL"
 
       - name: Upload ISO to S3
         env:

@@ -54,12 +54,13 @@ fetch_seapath_installer(){
 }
 
 # Fetch seapath artifacts.
-# Take two arguments: The base_url for Yocto images and the base_url for Debian images.
+# Take three arguments: The base_url for Yocto images, the base_url for Debian images and the base_url for SLES images.
 fetch_seapath_artifacts() {
     SEAPATH_IMAGES_DIR=mnt_extra/images
     SEAPATH_KEYS_DIR=mnt_extra/ssh
     yocto_base_url="$1"
     debian_base_url="$2"
+    sles_base_url="$3"
 
     mkdir -p $SEAPATH_KEYS_DIR
     mkdir -p $SEAPATH_IMAGES_DIR
@@ -79,6 +80,15 @@ fetch_seapath_artifacts() {
         "seapath-${SEAPATH_IMAGES_VERSION}-generic-cluster.rootfs.raw.bmap"
         "seapath-${SEAPATH_IMAGES_VERSION}-generic-observer.rootfs.raw.gz"
         "seapath-${SEAPATH_IMAGES_VERSION}-generic-observer.rootfs.raw.bmap"
+    )
+
+    sles_images=(
+        "seapath-${SEAPATH_IMAGES_VERSION}-sles-standalone.rootfs.raw.gz"
+        "seapath-${SEAPATH_IMAGES_VERSION}-sles-standalone.rootfs.raw.bmap"
+        "seapath-${SEAPATH_IMAGES_VERSION}-sles-cluster.rootfs.raw.gz"
+        "seapath-${SEAPATH_IMAGES_VERSION}-sles-cluster.rootfs.raw.bmap"
+        "seapath-${SEAPATH_IMAGES_VERSION}-sles-observer.rootfs.raw.gz"
+        "seapath-${SEAPATH_IMAGES_VERSION}-sles-observer.rootfs.raw.bmap"
     )
 
     keys=(
@@ -105,6 +115,23 @@ fetch_seapath_artifacts() {
         fi
     done
 
+    for f in "${sles_images[@]}"; do
+        # This test prevent failure while no SEAPATH SLES is officially released.
+        # This should be removed as soon as SEAPATH SLES is part of an official release.
+        if echo "$sles_base_url" | grep -q 'https://releases.seapath.org' && ! wget -S --spider "$sles_base_url/$f" 2>&1 | grep -q 'HTTP/1.1 200 OK'; then
+            echo "No SLES image $f found at $sles_base_url. Skipping download of remaining SLES images."
+            break
+        fi
+
+        if [ ! -f "$SEAPATH_IMAGES_DIR/$f" ]; then
+            sudo wget "$sles_base_url/$f" -O "$SEAPATH_IMAGES_DIR/$f"
+            if [[ $f == *.raw.gz ]]; then
+                generate_images_metadata "SLES" "$f"
+                sudo mv "${f%.raw.gz}.json" "$SEAPATH_IMAGES_DIR/"
+            fi
+        fi
+    done
+
     for k in "${keys[@]}"; do
         if [ ! -f "$SEAPATH_KEYS_DIR/$k" ]; then
             sudo wget "$yocto_base_url/$k" -O "$SEAPATH_KEYS_DIR/$k"
@@ -126,7 +153,7 @@ append_data_partition(){
 
     sudo mkdir -p mnt_extra/{ssh,images,others}
     if ! $empty; then
-        fetch_seapath_artifacts "$yocto_base_url" "$debian_base_url"
+        fetch_seapath_artifacts "$yocto_base_url" "$debian_base_url" "$sles_base_url"
     else
         echo "Building empty installer: skipping SEAPATH artifacts fetch"
     fi
@@ -149,6 +176,7 @@ tag=""
 installer_base_url=""
 yocto_base_url=""
 debian_base_url=""
+sles_base_url=""
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -176,6 +204,10 @@ while [[ $# -gt 0 ]]; do
             debian_base_url="${2:-$debian_base_url}"
             shift 2
             ;;
+        --sles-base-url)
+            sles_base_url="${2:-$sles_base_url}"
+            shift 2
+            ;;
         *)
             echo "Unknown option: $1"
             echo "Usage: $0 [--no-installer-fetch] [--empty] [--tag TAG] [--installer-base-url URL] [--yocto-base-url URL] [--debian-base-url URL]"
@@ -185,6 +217,7 @@ while [[ $# -gt 0 ]]; do
             echo "  --installer-base-url  Base URL for seapath-installer deb download. Default to releases.seapath.org releases"
             echo "  --yocto-base-url      Base URL for Yocto artifacts download. Default to releases.seapath.org releases"
             echo "  --debian-base-url     Base URL for Debian artifacts download. Default to releases.seapath.org releases"
+            echo "  --sles-base-url       Base URL for SLES artifacts download. Default to releases.seapath.org releases"
             exit 1
             ;;
     esac
@@ -205,6 +238,10 @@ fi
 
 if [ -z "$debian_base_url" ]; then
     debian_base_url="https://releases.seapath.org/builds/${SEAPATH_IMAGES_VERSION}"
+fi
+
+if [ -z "$sles_base_url" ]; then
+    sles_base_url="https://releases.seapath.org/builds/${SEAPATH_IMAGES_VERSION}"
 fi
 
 if ! $no_installer_fetch; then
