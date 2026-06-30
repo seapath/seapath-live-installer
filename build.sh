@@ -179,12 +179,12 @@ while [[ $# -gt 0 ]]; do
         *)
             echo "Unknown option: $1"
             echo "Usage: $0 [--no-installer-fetch] [--empty] [--tag TAG] [--installer-base-url URL] [--yocto-base-url URL] [--debian-base-url URL]"
-            echo "  --no-installer-fetch  Do not fetch seapath-installer from GitHub"
+            echo "  --no-installer-fetch  Do not fetch seapath-installer"
             echo "  --empty               Generate an empty installer (no SEAPATH images)"
             echo "  --tag                 Override SEAPATH images and installer versions"
-            echo "  --installer-base-url  Base URL for seapath-installer deb download. Default to GitHub releases"
-            echo "  --yocto-base-url      Base URL for Yocto artifacts download. Default to GitHub releases"
-            echo "  --debian-base-url     Base URL for Debian artifacts download. Default to GitHub releases"
+            echo "  --installer-base-url  Base URL for seapath-installer deb download. Default to releases.seapath.org releases"
+            echo "  --yocto-base-url      Base URL for Yocto artifacts download. Default to releases.seapath.org releases"
+            echo "  --debian-base-url     Base URL for Debian artifacts download. Default to releases.seapath.org releases"
             exit 1
             ;;
     esac
@@ -196,15 +196,15 @@ if [ -n "$tag" ]; then
 fi
 
 if [ -z "$installer_base_url" ]; then
-    installer_base_url="https://github.com/seapath/seapath-installer/releases/download/${SEAPATH_INSTALLER_VERSION}"
+    installer_base_url="https://releases.seapath.org/builds/${SEAPATH_INSTALLER_VERSION}"
 fi
 
 if [ -z "$yocto_base_url" ]; then
-    yocto_base_url="https://github.com/seapath/yocto-bsp/releases/download/${SEAPATH_IMAGES_VERSION}"
+    yocto_base_url="https://releases.seapath.org/builds/${SEAPATH_IMAGES_VERSION}"
 fi
 
 if [ -z "$debian_base_url" ]; then
-    debian_base_url="https://github.com/seapath/build_debian_iso/releases/download/${SEAPATH_IMAGES_VERSION}/"
+    debian_base_url="https://releases.seapath.org/builds/${SEAPATH_IMAGES_VERSION}"
 fi
 
 if ! $no_installer_fetch; then
