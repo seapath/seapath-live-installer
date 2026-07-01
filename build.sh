@@ -140,7 +140,7 @@ fetch_seapath_artifacts() {
 }
 
 append_data_partition(){
-    EXTRA_PARTITION_SIZE_MB=10240
+    EXTRA_PARTITION_SIZE_MB=13312   # 13Gb
 
     if [ ! -f extra_partition.img ]; then
         dd if=/dev/zero of=extra_partition.img bs=1M count=$EXTRA_PARTITION_SIZE_MB
