@@ -17,11 +17,7 @@ generate_images_metadata(){
 
     flavor=$1
 
-    if [ $flavor == "Debian" ]; then
-        filename=$(basename -s .raw.gz $2)
-        machine=$(echo $filename |  cut -d '.' -f3|cut -d '-' -f3)
-        description="A x86 SEAPATH Debian Image for $machine machines"
-    else
+    if [ $flavor == "Yocto" ]; then
         filename=$(basename -s .wic.gz $2)
         machine=$(echo $filename | cut -d'-' -f4)
 
@@ -29,9 +25,12 @@ generate_images_metadata(){
         if [ $(echo $filename | grep -c "host") -eq 0 ]; then
             machine=$(echo $filename | cut -d'-' -f3)
         fi
-        description="A x86 SEAPATH Yocto Image for $machine machines"
+    else
+        filename=$(basename -s .raw.gz $2)
+        machine=$(echo $filename |  cut -d '.' -f3|cut -d '-' -f3)
     fi
 
+    description="A x86 SEAPATH $flavor Image for $machine machines"
     version=$(echo $filename | cut -d'-' -f2)
     echo $json_content > "${filename}.json"
 
