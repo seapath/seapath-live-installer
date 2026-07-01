@@ -2,11 +2,11 @@
 #
 # SEAPATH Live installer iso creator.
 
-# Name:       fetch_seapath_artifacts
-# Brief:      Fetch seapath yocto and debian artifacts
-
 export SEAPATH_IMAGES_VERSION="v2.0.0"
 export SEAPATH_INSTALLER_VERSION="v2.0.0"
+
+# Generate metadata for the SEAPATH images in JSON format.
+# Takes two arguments: the flavor of the image and the filename of the image.
 generate_images_metadata(){
 
     json_content="{
